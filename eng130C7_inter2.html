@@ -1,0 +1,650 @@
+
+<html>
+<head>
+	<title></title>
+	<! -- By Behzad Vafaeian -->
+	<!-- the link and script tags import the JSXGraph library, must always have this here -->
+<link rel="stylesheet" type="text/css" href="https://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
+ 	<script type="text/javascript" src="https://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>
+</script>
+</head>
+<body>
+
+	<!-- This outer most div is the gray box and everything is contained inside it -->
+
+	<div style="margin: auto; padding: 2%; background-color: rgb(246,246,246);border-radius: 10px;font-family: 'helvetica','calibri';width: max-content;border: 1px solid rgb(220,220,220);">
+		
+
+		<!-- GRAPH -->
+		<div id="box" class="jxgbox" style="width:650px; height:700px; border: 1px; solid rgb(210,210,210);"></;"></div>
+		<div id="box2" class="jxgbox" style="width:650px; height:700px; border: 1px; solid rgb(210,210,210);"></;"></div>
+
+	</div>
+	
+	
+	
+	<script type="text/javascript">
+
+	
+	var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-6.5 ,8, 6.5, -6], axis:false, grid:false, showCopyright:false, showNavigation:false, zoomFactor:0.95});
+	var board2 = JXG.JSXGraph.initBoard('box2', {boundingbox: [-6.5 ,8, 6.5, -6], axis:false, grid:false, showCopyright:false, zoomFactor:0.95});
+
+	var _dy = 0;
+	var drawings = [] ;// drawings appearing on the board from the solve function 
+	
+	function xS (d){
+		// scales the length for visualization purposes
+		return d/L*12;
+	}
+	
+	function dcmls(number){
+		number = Math.abs(number);
+		if (number < 10) {
+			return 2;
+		} else if (10<=number && number < 100) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	
+	// images
+	var L = 5;
+	var ssb = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_sb.jpg', [-6.0,-2.5], [12,0.5]], {fixed: true, visible: true, highlight:false});
+	var ssbs1 = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_sb_s1.jpg', [-6.4,-3.29], [0.9,0.8]], {fixed: true, visible: true, highlight:false});
+	// ssbs1_slider is for the right-hand support; the name should be changed to ssb2_slider later 
+  var ssbs1_slider = board.create('slider', [[12/5-6, '-2.8'], ['6.0', '-2.8'], [L/5, L, L]], {snapWidth: 0.25, withLabel: false});
+	var ssbs2 = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_sb_s2.jpg', [function (){return ssbs1_slider.Value()/L*12 - 0.45 - 6;},'-3.29'], [0.9,0.8]], {fixed: true, visible: true, highlight:false});
+	var ssbsText = board.create('text',[function (){return ssbs1_slider.Value()/L*12 - 0.45 - 6;},'-3.5',function(){return 'x=' + ssbs1_slider.Value();}], {highlight:false, fontSize: 15, cssStyle: 'font-style: regular'});
+	var cb = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_cb.jpg', [-6.3,-2.85], [12.3,1.2]], {fixed: true, visible: false, highlight:false});
+
+	
+	
+	// input
+	// types of beam 2 types, with two simple supports, cantiliver 
+	var inst1 = board.create('text',['-6.5',7.5,"1) Select type of beam"], {highlight:false, fontSize: 20, cssStyle: 'font-style: regular'});
+	
+	var inst1Checkbox1 = board.create('checkbox', ['-1.5',7.5, 'Simply supported'], {checked:true, highlight:false, fontSize: 17});
+	var inst1Checkbox2 = board.create('checkbox', ['2.5',7.5, 'Cantiliver (fixed)'], {checked: false, highlight:false, fontSize: 17});
+	
+	
+	JXG.addEvent(inst1Checkbox1.rendNodeCheckbox, 'change', function() {
+		if (inst1Checkbox1.Value()) {
+			inst1Checkbox2.rendNodeCheckbox.checked=false;
+			ssb.setAttribute({visible : true});
+			ssbs1.setAttribute({visible : true});
+			ssbs2.setAttribute({visible : true});
+			ssbs1_slider = board.create('slider', [[12/5-6, '-2.8'], ['6.0', '-2.8'], [L/5, L, L]], {snapWidth: 0.25, withLabel: false});
+			ssbsText = board.create('text',[function (){return ssbs1_slider.Value()/L*12 - 0.45 - 6;},'-3.5',function(){return 'x=' + ssbs1_slider.Value();}], {highlight:false, fontSize: 15, cssStyle: 'font-style: regular'});
+			cb.setAttribute({visible : false});
+
+			
+			//inputG_SS('SS');
+		} else {
+			inst1Checkbox2.rendNodeCheckbox.checked=true;
+			ssb.setAttribute({visible : false});
+			ssbs1.setAttribute({visible : false});
+			ssbs2.setAttribute({visible : false});
+			ssbs1_slider.remove();
+			ssbsText.remove();
+			cb.setAttribute({visible : true});
+
+			//inputG_SS('FS');
+		}
+	}, inst1Checkbox1);
+	
+			
+	JXG.addEvent(inst1Checkbox2.rendNodeCheckbox, 'change', function() {
+		if (inst1Checkbox2.Value()) {
+			inst1Checkbox1.rendNodeCheckbox.checked=false;
+			ssb.setAttribute({visible : false});
+			ssbs1.setAttribute({visible : false});
+			ssbs2.setAttribute({visible : false});
+			ssbs1_slider .remove();
+			ssbsText.remove();
+			cb.setAttribute({visible : true});
+
+			// inputG_SS('FS');
+
+		} else {
+			inst1Checkbox1.rendNodeCheckbox.checked=true;
+			ssb.setAttribute({visible : true});
+			ssbs1.setAttribute({visible : true});
+			ssbs2.setAttribute({visible : true});
+			ssbs1_slider = board.create('slider', [[12/5-6, '-2.8'], ['6.0', '-2.8'], [L/5, L, L]], {snapWidth: 0.25, withLabel: false});
+			ssbsText = board.create('text',[function (){return ssbs1_slider.Value()/L*12 - 0.45 - 6;},'-3.5',function(){return 'x=' + ssbs1_slider.Value();}], {highlight:false, fontSize: 15, cssStyle: 'font-style: regular'});
+			cb.setAttribute({visible : false});
+
+			// inputG_SS('FS');
+		}
+	}, inst1Checkbox2);
+	
+	
+	
+	var inst2 = board.create('text',['-6.5',6.7,"2) Input the beam length (m)"], {highlight:false, fontSize: 20, cssStyle: 'font-style: regular'});
+	var beamLInput = board.create('input', ['-0.5',6.7, '5', 'L=  '],{cssStyle: 'width: 30px; font-style: italic', fontSize:15});
+	var text1 = board.create('text',['0.6',6.7,"(press enter) Note: minimum L = 1"], {highlight:false, fontSize: 14, cssStyle: 'font-weight: bold;'});
+
+
+	
+	L = parseFloat(Math.abs(beamLInput.Value()));
+	
+
+	
+	JXG.addEvent(beamLInput.rendNodeInput, 'change', function() {
+		L = parseFloat(Math.abs(beamLInput.Value()));
+		if (L < 1) L=1.0;
+		pLoad1Slider.setMax(L);
+		pLoad2Slider.setMax(L);
+		pLoad1Slider.visProp.snapwidth=L/20;
+		pLoad2Slider.visProp.snapwidth=L/20;
+				
+		mLoad1Slider.setMax(L);
+		mLoad2Slider.setMax(L);
+		mLoad1Slider.visProp.snapwidth=L/20;
+		mLoad2Slider.visProp.snapwidth=L/20;
+		
+		ssbs1_slider.setMax(L);
+		ssbs1_slider.setMin(L/5);
+		ssbs1_slider.setValue(L);
+		ssbs1_slider.visProp.snapwidth=L/20;
+		
+		dInputBoxUpdate();
+		aInputBoxUpdate();
+		
+		
+		}, beamLInput);
+	
+	var inst3 = board.create('text',['-6.5',6.0,"3) Set loads, and relocate the supports (if applicable)"], {highlight:false, fontSize: 20, cssStyle: 'font-style: regular'});
+	
+	var pLoad1Checkbox = board.create('checkbox', ['-5.2',5.4, 'Point load (kN)'], {checked:true, fontSize: 15});
+	var pLoad1Input = board.create('input', ['-2.5',5.4, '5', 'F1=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
+	var pLoad1UpCheckbox = board.create('checkbox', ['-1.2',5.4, 'Up'], {checked:false, fontSize: 15});
+	var pLoad1Slider = board.create('slider', [['0.0', '5.4'], ['5.0', '5.4'], [0, 0, L]], {name: 'x', label:{fontSize: 15}, snapWidth: 0.25, withLabel: true,  withTicks: true, ticks:{defaultDistance: 1.0, equidistant: true, insertTicks: false, drawZero: true, drawLabels: false, majorHeight: 15, minorTicks: 0}});
+	function pLoad1(dy,board) {
+		var L1P1 = board.create('point', [function(){return xS(pLoad1Slider.Value())-6;},function(){if (pLoad1UpCheckbox.Value()) {return -2+dy;} else {return 0+dy;}}],{visible:false});
+		var L1P2 = board.create('point', [function(){return xS(pLoad1Slider.Value())-6;},function(){if (pLoad1UpCheckbox.Value()) {return 0+dy;} else {return -2+dy;}}],{visible:false});
+		var pLoad1arrw = board.create('arrow', [L1P1, L1P2],{visible: function(){return (pLoad1Input.Value() != 0 && pLoad1Checkbox.Value());}, 
+		strokeWidth:4, strokeColor:'green', fixed: true, highlight: false, lastArrow:{type:2, size: 4}, withLabel: true, name:function (){return pLoad1Input.Value();},
+		label: {visible: function(){return (pLoad1Input.Value() != 0 && pLoad1Checkbox.Value());}, autoPosition: false, position: 'top', offset:[-5,55], labelColor:'green', fontSize:17, cssStyle:'font-weight:bold'}});
+		return [L1P1, L1P2, pLoad1arrw];
+	}
+	pLoad1(0, board);
+	
+	var pLoad2Checkbox = board.create('checkbox', ['-5.2',4.7, 'Point load (kN)'], {checked: false, fontSize: 15});
+	var pLoad2Input = board.create('input', ['-2.5',4.7, '0', 'F2=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
+	var pLoad2UpCheckbox = board.create('checkbox', ['-1.2',4.7, 'Up'], {checked:false, fontSize: 15});
+	var pLoad2Slider = board.create('slider', [['0.0', '4.7'], ['5.0', '4.7'], [0, 0, L]], {name: 'x', label:{fontSize: 15}, snapWidth: 0.25, withLabel: true,  withTicks: true, ticks:{defaultDistance: 1.0, equidistant: true, insertTicks: false, drawZero: true, drawLabels: false, majorHeight: 15, minorTicks: 0}});
+	function pLoad2(dy, board) {
+		var L2P1 = board.create('point', [function(){return xS(pLoad2Slider.Value())-6;},function(){if (pLoad2UpCheckbox.Value()) {return -2+dy;} else {return 0+dy;}}],{visible:false});
+		var L2P2 = board.create('point', [function(){return xS(pLoad2Slider.Value())-6;},function(){if (pLoad2UpCheckbox.Value()) {return 0+dy;} else {return -2+dy;}}],{visible:false});
+		var pLoad2arrw = board.create('arrow', [L2P1, L2P2],{visible: function(){return (pLoad2Input.Value() != 0 && pLoad2Checkbox.Value());}, 
+		strokeWidth:4, strokeColor:'olive', fixed: true, highlight: false, lastArrow:{type:2, size: 4}, name: function (){return pLoad2Input.Value();},
+		withLabel: true, label: {visible: function(){return (pLoad2Input.Value() != 0 && pLoad2Checkbox.Value());}, autoPosition: false, position: 'top', offset:[-5,55], 
+		labelColor:'blue', fontSize:17, cssStyle:'font-weight:bold'}});
+		return [L2P1, L2P2, pLoad2arrw];
+	}
+	pLoad2(0, board);
+	
+	
+		
+	var mLoad1Checkbox = board.create('checkbox', ['-6.3',4.0, 'Couple moment (kN.m)'], {checked:true, fontSize: 15});
+	var mLoad1Input = board.create('input', ['-2.6',4.0, '5', 'M1=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
+	var mLoad1UpCheckbox = board.create('checkbox', ['-1.2',4.0, 'CW'], {checked:false, fontSize: 15});
+	var mLoad1Slider = board.create('slider', [['0.0', '4.0'], ['5.0', '4.0'], [0, 0, L]], {name: 'x', label:{fontSize: 15}, snapWidth: 0.25, withLabel: true,  withTicks: true, ticks:{defaultDistance: 1.0, equidistant: true, insertTicks: false, drawZero: true, drawLabels: false, majorHeight: 15, minorTicks: 0}});
+	function mLoad1(dy, board) {
+		var M1P1 = board.create('point', [function(){return xS(mLoad1Slider.Value())-6;}, -2.3+dy] , {visible: function(){return (mLoad1Input.Value() != 0 && mLoad1Checkbox.Value());}, size:2, withLabel:false, color: 'orangered'});
+		var M1P2 = board.create('point', [function(){return xS(mLoad1Slider.Value())-6;}, -2.7+dy], {visible:false, fixed:true});
+		var M1P3 = board.create('point', [function(){return xS(mLoad1Slider.Value())-6;}, -1.9+dy], {visible:false, fixed:true});
+		var M1arP1 = board.create('point', [function () {return M1P3.X();}, function () {if (mLoad1UpCheckbox.Value()) {return M1P2.Y();} else {return M1P3.Y();}}], {visible:false, fixed:true});
+		var M1arP2 = board.create('point', [function () {return M1P3.X()-0.3;}, function () {if (mLoad1UpCheckbox.Value()) {return M1P2.Y();} else {return M1P3.Y();}}], {visible:false, fixed: true});
+		var M1a = board.create('arc', [M1P1, M1P2, M1P3], {visible: function(){return (mLoad1Input.Value() != 0 && mLoad1Checkbox.Value());},strokeColor: 'orangered', strokeWidth:4, highlight:false});
+		var M1ar = board.create('arrow', [M1arP1, M1arP2],{visible: function(){return (mLoad1Input.Value() != 0 && mLoad1Checkbox.Value());}, strokeWidth:4, 
+		strokeColor:'orangered', fixed: true, highlight: false, lastArrow:{type:1, size: 3} , name: function (){return mLoad1Input.Value();}, withLabel: true,
+		label: {visible: function(){return (mLoad1Input.Value() != 0 && mLoad1Checkbox.Value());}, autoPosition: false, position: 'top', offset:[-15,10], 
+		labelColor:'red', fontSize:17, cssStyle:'font-weight:bold'}});
+		return [M1P1, M1P2, M1P3, M1arP1, M1arP2, M1a, M1ar ];
+	}
+	mLoad1(0, board)
+	
+
+	var mLoad2Checkbox = board.create('checkbox', ['-6.3',3.3, 'Couple moment (kN.m)'], {checked: false, fontSize: 15});
+	var mLoad2Input = board.create('input', ['-2.6',3.3, '0', 'M2=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
+	var mLoad2UpCheckbox = board.create('checkbox', ['-1.2',3.3, 'CW'], {checked:false, fontSize: 15});
+	var mLoad2Slider = board.create('slider', [['0.0', '3.3'], ['5.0', '3.3'], [0, 0, L]], {name: 'x', label:{fontSize: 15},snapWidth: 0.25, withLabel: true,  withTicks: true, ticks:{defaultDistance: 1.0, equidistant: true, insertTicks: false, drawZero: true, drawLabels: false, majorHeight: 15, minorTicks: 0}});
+	function mLoad2(dy, board) {
+		var M2P1 = board.create('point', [function(){return xS(mLoad2Slider.Value())-6;}, -2.3+dy] , {visible: function(){return (mLoad2Input.Value() != 0 && mLoad2Checkbox.Value());}, size:2, withLabel:false, color: 'tomato'});
+		var M2P2 = board.create('point', [function(){return xS(mLoad2Slider.Value())-6;}, -2.7+dy], {visible:false, fixed:true});
+		var M2P3 = board.create('point', [function(){return xS(mLoad2Slider.Value())-6;}, -1.9+dy], {visible:false, fixed:true});
+		var M2arP1 = board.create('point', [function () {return M2P3.X();}, function () {if (mLoad2UpCheckbox.Value()) {return M2P2.Y();} else {return M2P3.Y();}}], {visible:false, fixed:true});
+		var M2arP2 = board.create('point', [function () {return M2P3.X()-0.3;}, function () {if (mLoad2UpCheckbox.Value()) {return M2P2.Y();} else {return M2P3.Y();}}], {visible:false, fixed: true});
+		var M2a = board.create('arc', [M2P1, M2P2, M2P3], {visible: function(){return (mLoad2Input.Value() != 0 && mLoad2Checkbox.Value());},strokeColor: 'tomato', strokeWidth:4, highlight:false});
+		var M2ar = board.create('arrow', [M2arP1, M2arP2],{visible: function(){return (mLoad2Input.Value() != 0 && mLoad2Checkbox.Value());}, strokeWidth:4,
+		strokeColor:'tomato', fixed: true, highlight: false, lastArrow:{type:1, size: 3}, name: function (){return mLoad2Input.Value();}, withLabel: true,
+		label: {visible: function(){return (mLoad2Input.Value() != 0 && mLoad2Checkbox.Value());}, autoPosition: false, position: 'top', offset:[-15,10], 
+		labelColor:'tomato', fontSize:17, cssStyle:'font-weight:bold'}});
+		return [M2P1, M2P2, M2P3, M2arP1, M2arP2, M2a, M2ar ];
+	}
+	mLoad2(0, board)
+	
+	
+	// distributed load
+	var linLoadInst = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_inst.jpg', [0.5,0.3], [5.5,2.5]], {fixed: true, visible: true, highlight:false});
+	var linLoad1Checkbox = board.create('checkbox', ['-6.3',2.0, 'Linearly distributed load (kN/m)'], {checked: true, fontSize: 15});
+	var w1L1Input = board.create('input', ['-6.2',1.3, '1', 'w1=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
+	var w2L1Input = board.create('input', ['-4.5',1.3, '1', 'w2=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
+	var dL1Input = board.create('input', ['-2.7',1.3, '2', 'd=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
+	var aL1Input = board.create('input', ['-1.2',1.3, '1', 'a=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
+	
+	var text2 = board.create('text',['-4.8',0.6,"(press enter) Note: a + d < L"], {highlight:false, fontSize: 14, cssStyle: 'font-weight: bold;'});
+	
+	var out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), parseFloat(w1L1Input.Value()),parseFloat(w2L1Input.Value()), board);
+	
+	// function for updating the input boxes of the distributed load
+	
+	var dInputBoxUpdate = function () {
+		if (parseFloat(dL1Input.Value()) +  parseFloat(aL1Input.Value()) > L){
+			dL1Input._value = L - aL1Input.Value();
+			dL1Input.rendNodeInput.value = dL1Input.Value();
+			if (linLoad1Checkbox.Value()){
+				remv(out1);
+				out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), parseFloat(w1L1Input.Value()),parseFloat(w2L1Input.Value()), board);
+			}
+			} else {
+			if (linLoad1Checkbox.Value()){
+				remv(out1);
+				out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), parseFloat(w1L1Input.Value()),parseFloat(w2L1Input.Value()), board);
+			}
+		}
+	}
+	
+	var aInputBoxUpdate = function() {
+		if (parseFloat(aL1Input.Value()) + parseFloat(dL1Input.Value()) < L){
+			if (linLoad1Checkbox.Value()){
+				remv(out1);
+				out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), parseFloat(w1L1Input.Value()),parseFloat(w2L1Input.Value()), board);
+			}
+		} else {
+			aL1Input._value = L - dL1Input.Value();
+			aL1Input.rendNodeInput.value= L - dL1Input.Value();
+			if (linLoad1Checkbox.Value()){
+				remv(out1);
+				out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), parseFloat(w1L1Input.Value()),parseFloat(w2L1Input.Value()), board);
+			}
+		}
+		}
+	
+	JXG.addEvent(dL1Input.rendNodeInput, 'change',dInputBoxUpdate, dL1Input);
+	JXG.addEvent(aL1Input.rendNodeInput, 'change', aInputBoxUpdate , aL1Input);
+
+		
+	
+	JXG.addEvent(w1L1Input.rendNodeInput, 'change', function() {
+		if (linLoad1Checkbox.Value()){
+			remv(out1);
+			out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), Math.abs(parseFloat(w1L1Input.Value())),Math.abs(parseFloat(w2L1Input.Value())), board);
+		}
+	}, w1L1Input);
+	
+	JXG.addEvent(w2L1Input.rendNodeInput, 'change', function() {
+		if (linLoad1Checkbox.Value()){
+			remv(out1);	
+			out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), Math.abs(parseFloat(w1L1Input.Value())),Math.abs(parseFloat(w2L1Input.Value())), board);
+		}
+	}, w2L1Input);
+		
+	JXG.addEvent(linLoad1Checkbox.rendNodeCheckbox, 'change', function() {
+		if (!linLoad1Checkbox.Value()){
+			remv(out1);	
+		} else {
+			remv(out1);
+			out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), Math.abs(parseFloat(w1L1Input.Value())),Math.abs(parseFloat(w2L1Input.Value())), board);
+		}
+	}, linLoad1Checkbox);
+	
+	
+	
+	// distributed load visualizer
+	function distLoad(x1, d, w1, w2, board, dy=0){
+		// vars are float
+		items = []
+		var x2 = x1 + d;
+		var dl = d/10;
+
+		var slope = (w2 - w1)/d;
+		var arwMaxLength = 1;
+		if (Math.abs(Math.min(w1,w2)/Math.max(w1,w2)) < 0.25) arwMaxLength = 1.5;
+		
+		var px = [];
+		var p1y = [];
+		var p2y = -2+dy;
+		
+		var hdSize = [];
+		var sf = 1/Math.max(w1, w2);
+		for (i=0;i<=10;i++){
+			px[i] = x1 + i*dl;
+			p1y[i] = (w1 + slope*i*dl)*sf*arwMaxLength+ p2y;
+			if (Math.abs(p1y[i] - p2y)<= 0.2) {
+				hdSize [i]=0.05;
+			} else {
+				hdSize[i]=3;
+			}
+		}
+		var loadArws = [];
+		for (i=0;i<=10;i++){
+			var p1 = board.create('point', [px[i],p1y[i]],{visible:false});
+			var p2 = board.create('point', [px[i],p2y],{visible:false});
+			loadArws[i] = board.create('arrow', [p1, p2],{visible: true, strokeWidth:3, strokeColor:"black", fixed: true, highlight: false, 
+				lastArrow:{type:2, size: hdSize[i]}});
+			items.push(p1,p2,loadArws[i]);
+		}
+		var w1text = board.create('text',[px[0]-1/20,p1y[0]+0.2,w1.toString()], {highlight:false, fontSize: 17, cssStyle:'font-weight:bold'});
+		var w2text = board.create('text',[px[10]-1/25,p1y[10]+0.2,w2.toString()], {highlight:false, fontSize: 17, cssStyle:'font-weight:bold'});
+		var loadLine = board.create('segment', [[x1,p1y[0]], [x2,p1y[10]]], {highlight: false, fixed: true, strokeWidth:3, strokeColor: 'black'});
+		items.push(w1text, w2text, loadLine);
+		return items;
+	}
+	
+	
+	function remv(objects){
+		
+		board.suspendUpdate();
+		//for (i=0; i<objects.length;i++){
+			board.removeObject(objects);
+		//}
+		board.unsuspendUpdate();
+	}
+	
+	
+	
+	function dimension (x1,x2,y,len){
+
+		var segmentH = board.create('segment', [[x1,y], [x2,y]], {fixed: true, highlight: false, strokeWidth:1.5, strokeColor: 'black' , withLabel:true, name: len, 
+			label: {visible: true, autoPosition: false, position: 'bot', offset:[-5,-10], labelColor:'black', fontSize:17}, lastArrow:{type:1, size:5}, firstArrow:{type:1, size:5}});
+		var segmentV1 = board.create('segment', [[x1,y-0.2], [x1,y+0.2]], {fixed: true, highlight: false, strokeWidth:1.5, strokeColor: 'black'});
+		var segmentV2 =  board.create('segment', [[x2,y-0.2], [x2,y+0.2]], {fixed: true, highlight: false, strokeWidth:1.5, strokeColor: 'black'});
+	}
+	
+	dimension(-6,6,-3.8, function(){return 'L='+L});
+	
+	
+	var button1 = board.create('button', [-1.9, -4.8, 'SOLVE',solve], {fontsize:20});
+	button1.rendNodeButton.style.backgroundColor='orange';
+	button1.rendNodeButton.style.paddingLeft='60px';
+	button1.rendNodeButton.style.paddingRight='60px';
+
+	
+	// solve
+	
+	function solve (){
+		
+		// variables
+		var F1=0; var F2=0; var xF1=0; var xF2=0; var M1=0; var xM1=0; var M2=0; var xM2=0; var w1=1; var w2=0; var d=0; var a=0; // w1 is set to 1 to avoid dividing by zero when calculating support reactions
+		var xS2 = ssbs1_slider.Value();
+		
+		var board =  board2;
+		board.suspendUpdate();
+		var n = drawings.length;
+		for (i=0; i<n;i++){
+			board2.removeObject(drawings.pop());
+		}
+		board.unsuspendUpdate();
+		
+		board.suspendUpdate();
+		// FBD
+		var ssbFBD = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_sb.jpg', [-6.0,5], [12,0.5]], {fixed: true, visible: true, highlightfillopacity:1});
+		if (pLoad1Checkbox.Value()){
+			var drwngs1 = pLoad1(7.5, board);
+			drawings.push(drwngs1);
+			F1 = Math.abs(parseFloat(pLoad1Input.Value()));
+			if (pLoad1UpCheckbox.Value()) F1 = -1 * F1;
+			xF1 = pLoad1Slider.Value();
+		
+		}
+		if (pLoad2Checkbox.Value()){
+			var drwngs2 = pLoad2(7.5, board);
+			drawings.push(drwngs2);
+			F2 = Math.abs(parseFloat(pLoad2Input.Value()));
+			if (pLoad2UpCheckbox.Value()) F2 = -1 * F2;
+			xF2 = pLoad2Slider.Value();
+		}
+		if (mLoad1Checkbox.Value()){
+			var drwngs3 = mLoad1(7.5, board);
+			drawings.push(drwngs3);
+			M1 = Math.abs(parseFloat(mLoad1Input.Value()));
+			if (mLoad1UpCheckbox.Value()) M1 = -1 * M1;
+			xM1 = mLoad1Slider.Value();
+		}
+		if (mLoad2Checkbox.Value()){
+			var drwngs4 = mLoad2(7.5, board);
+			drawings.push(drwngs4);
+			M2 = Math.abs(parseFloat(mLoad2Input.Value()));
+			if (mLoad2UpCheckbox.Value()) M2 = -1 * M2;
+			xM2 = mLoad2Slider.Value();
+			
+		}
+		if (linLoad1Checkbox.Value()){
+			var drwngs5 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), parseFloat(w1L1Input.Value()),parseFloat(w2L1Input.Value()),board,7.5);
+			drawings.push(drwngs5);
+			w1 = Math.abs(parseFloat(w1L1Input.Value()));
+			w2 = Math.abs(parseFloat(w2L1Input.Value())); 
+			d = Math.abs(parseFloat(dL1Input.Value())); 
+			a = Math.abs(parseFloat(aL1Input.Value())); 
+		}
+
+		
+		board.unsuspendUpdate();
+		
+		// support reactions
+		
+		if (inst1Checkbox1.Value()){
+			var S2y = 1/(xS2)*( xF1*F1 + xF2*F2 + (w1+w2)/2*d*(a+ d/3*(w1 + 2*w2)/(w1+w2)) -M1 - M2); //right support
+			var S1y = F1 + F2 + (w1+w2)/2*d -S2y;
+			var MS = null;			
+		} else {
+			var S2y = null;
+			var S1y = F1 + F2 + (w1+w2)/2*d;
+			var MS = xF1*F1 + xF2*F2 + (w1+w2)/2*d*(a+ d/3*(w1 + 2*w2)/(w1+w2)) -M1 - M2 // CCW is +
+		}
+		
+		if (Math.abs(S1y)>0.01){
+			var S1P1 = board.create('point', [-6,function(){if (S1y>0) {return 4;} else {return 5;}}],{visible:false});
+			var S1P2 = board.create('point', [-6, function(){if (S1y>0) {return 5;} else {return 4;}}],{visible:false});
+			var S1yArrw = board.create('arrow', [S1P1, S1P2],{visible: true, 
+				strokeWidth:4, strokeColor:'blue', fixed: true, highlight: false, lastArrow:{type:2, size: 4}, withLabel: true, name: Math.abs(S1y).toFixed(2),
+				label: {visible: true, autoPosition: false, position: 'top', offset:[-10,-33], labelColor:'black', fontSize:17, cssStyle:'font-weight:bold'}});
+			drawings.push(S1P1, S1P2, S1yArrw);
+		}		
+		if (S2y!=null && Math.abs(S2y)>0.01){
+			var S2P1 = board.create('point', [xS(ssbs1_slider.Value())-6,function(){if (S2y>0) {return 4;} else {return 5;}}],{visible:false});
+			var S2P2 = board.create('point', [xS(ssbs1_slider.Value())-6, function(){if (S2y>0) {return 5;} else {return 4;}}],{visible:false});
+			var S2yArrw = board.create('arrow', [S2P1, S2P2],{visible: true, 
+				strokeWidth:4, strokeColor:'blue', fixed: true, highlight: false, lastArrow:{type:2, size: 4}, withLabel: true, name: Math.abs(S2y).toFixed(2),
+				label: {visible: true, autoPosition: false, position: 'top', offset:[-20,-35], labelColor:'black', fontSize:17, cssStyle:'font-weight:bold'}});
+			drawings.push(S2P1, S2P2, S2yArrw);
+		}
+		
+		if (MS!=null && Math.abs(MS)>0.01){
+			var MSP1 = board.create('point', [-6, 5.2] , {visible: true, size:2, withLabel:false, color: 'purple'});
+			var MSP2 = board.create('point', [-6, 5.6], {visible:false, fixed:true});
+			var MSP3 = board.create('point', [-6, 4.8], {visible:false, fixed:true});
+			var MSarP1 = board.create('point', [function () {return MSP3.X();}, function () {if (MS<0) {return MSP2.Y();} else {return MSP3.Y();}}], {visible:false, fixed:true});
+			var MSarP2 = board.create('point', [function () {return MSP3.X()+0.3;}, function () {if (MS<0) {return MSP2.Y();} else {return MSP3.Y();}}], {visible:false, fixed: true});
+			var MSa = board.create('arc', [MSP1, MSP2, MSP3], {strokeColor: 'purple', strokeWidth:4, highlight:false});
+			var MSar = board.create('arrow', [MSarP1, MSarP2],{strokeWidth:4, strokeColor:'purple', fixed: true, highlight: false, lastArrow:{type:1, size: 3},
+				name: Math.abs(MS).toFixed(2), withLabel: true, 	label: {visible: true, autoPosition: false,
+				position: 'top', offset: function(){if (MS>0){return [5,-5];}else {return [2,-40];}},	labelColor:'purple', fontSize:17, cssStyle:'font-weight:bold'}});
+			drawings.push(MSP1, MSP2, MSP3, MSarP1, MSarP2, MSa, MSar);
+		}
+		
+		drawings.push(ssbFBD);
+		
+		
+		// graphs
+		board2.suspendUpdate();		
+		
+		//
+		function VS1(x) {
+			if (x<=0){
+				return 0;
+			} else {
+				return S1y;
+			}
+		}
+		
+		if (inst1Checkbox1){
+			function VS2(x) {
+				if (x <= xS2){
+					return 0;
+				} else{
+					return S2y;
+				}
+			}
+		} else {
+			function VS2(x){return 0;}
+		}
+			
+		
+		if (linLoad1Checkbox.Value()){
+			function distLoadV(x){ 
+				if (x<a){
+					return 0;
+				}else if (x>=a && x<=a+d) {
+					return -1*((w2-w1)/(2*d)*Math.pow((x-a),2)+w1*x) +w1*a;
+				}else if (x>a+d){
+					return -1*((w2-w1)/(2*d)*Math.pow(d,2)+w1*(a+d)) +w1*a;
+				}
+			}
+		} else {
+			function distLoadV(x){return 0;}
+		}
+
+		
+		function pLoad1V(x) {
+			if (x<=xF1) {
+				return 0;
+			}else{
+				return -1*F1;
+		}};
+		
+		function pLoad2V(x) {
+			if (x<=xF2) {
+				return 0;
+			}else{
+				return -1*F2;
+		}};
+		
+		var Vx = function(x) {return VS1(x) + distLoadV(x) + pLoad1V(x) + pLoad2V(x) + VS2(x);}; 
+		
+		var eps = 0.01;
+		var vMax = Math.max(Math.abs(Vx(0+eps)), Math.abs(Vx(a+d)), Math.abs(Vx(xF1-eps)),Math.abs(Vx(xF1+eps)), Math.abs(Vx(xF2-eps)), 
+			Math.abs(Vx(xF2+eps)), Math.abs(Vx(xS2-eps)), Math.abs(Vx(xS2+eps)), Math.abs(Vx(L-eps)));
+		var sfShear =  1/vMax;
+		
+		// console.log(sfShear, Math.abs(Vx(0+0.025)), Math.abs(Vx(a+d)), Math.abs(Vx(xF1-0.025)),Math.abs(Vx(xF1+0.025)), Math.abs(Vx(xF2-0.025)), Math.abs(Vx(xF2+0.025)), Math.abs(Vx(xS2-0.025)), Math.abs(Vx(xS2+0.025)), Math.abs(Vx(L-0.025)));
+			
+		var SFDFucntion = function(x) {return 1.5*sfShear*(VS1(L/12*(x+6)) + distLoadV(L/12*(x+6)) + pLoad1V(L/12*(x+6)) + pLoad2V(L/12*(x+6)) + VS2(L/12*(x+6))) + 1.0;};
+		var SFD = board2.create('functiongraph',[SFDFucntion , -6,6], {strokeWidth:3, highlight: false} );
+		
+		// axes
+		var n = dcmls(vMax);
+		
+		var xaxis= board.create('segment', [[-6,1],[6.2,1]], {fixed: true, highlight: false, strokeWidth:2, strokeColor: 'black' , withLabel:true, name: 'x(m)', 
+			label: {visible: true, autoPosition: false, position: 'bot', offset:[290,0], labelColor:'black', fontSize:15}, lastArrow:{type:1, size:4}});
+		
+		var xtks= board2.create('ticks', [xaxis, [3, 6, 9, 12]], { highlight: false, strokeWidth: 2, strokeColor: 'black', majorHeight: 7, 
+			drawLabels: true, labels:[(L/4).toFixed(2),(L/2).toFixed(2),(L*3/4).toFixed(2),L.toFixed(2)], 
+			drawZero: false, drawLabels:true, 	minorTicks:0, majorTicks:0, label: {highlight: false, fontSize: 14, cssStyle:'font-weight:bold',
+			offset: [-10, -20]}});
+		
+		var vaxis= board.create('segment', [[-6,-0.8],[-6,2.8]], {fixed: true, highlight: false, strokeWidth:2, strokeColor: 'black' , withLabel:true, name: 'V(kN)', 
+			label: {visible: true, autoPosition: false, position: 'bot', offset:[-15,95], labelColor:'black', fontSize:20}, lastArrow:{type:1, size:4}});
+		
+		var vtks= board2.create('ticks', [vaxis, [0.3,1.05,1.8,2.55,3.3]], { highlight: false, strokeWidth: 2, strokeColor: 'black', majorHeight: 5, drawLabels: true, 
+			labels:[(-1*vMax).toFixed(n), (-1/2*vMax).toFixed(n), 0, (1/2*vMax).toFixed(n), vMax.toFixed(n)],  drawZero: false, drawLabels:true, 
+			minorTicks:0, majorTicks:0, label: {fontSize: 15, offset: [-40, 0], cssStyle:'font-weight:bold'}});
+		
+		var hGridsV = [];
+		for (i=0; i<5; i++){
+				hGridsV[i] = board.create('segment', [[-6,-0.5+i*0.75],[6.2,-0.5+i*0.75]], {fixed: true, highlight: false, strokeWidth:1, strokeColor: '#ff9f9f', layer:0});
+		}
+			
+		
+		
+		
+		
+		// bending moment
+		
+		function mLoad1M(x) {
+			if (x<xM1) {
+				return 0;
+			}else{
+				return -1*M1;
+		}};
+		
+		function mLoad2M(x) {
+			if (x<xM2) {
+				return 0;
+			}else{
+				return -1*M2;
+		}};
+		
+		var Mx =  function(x) {return Math.round(1000*(JXG.Math.Numerics.I([0,x], Vx) + (-1*MS) + mLoad1M(x) + mLoad2M(x)))/1000;}; // -1 for complying with internal force signs
+		
+		if (linLoad1Checkbox.Value() && Vx(a)*Vx(a+d)<0){
+			if (w1 == w2){
+				var x0=(w1*a+Vx(a))/w1;
+			} else {
+				var c1 = -1*(w2-w1)/(2*d);
+				var c2 = w1*a+Vx(a);
+				var c3 = c1*a*a + c2;
+				var x01 = (2*a*c1+w1+ Math.sqrt(Math.pow(2*a*c1+w1,2)-4*c1*c3))/(2*c1);
+				var x02 = (2*a*c1+w1- Math.sqrt(Math.pow(2*a*c1+w1,2)-4*c1*c3))/(2*c1);
+				if (a<=x01 && x01<=a+d){
+					var x0 =x01;
+				} else {
+					var x0 = x02;
+				}
+			}
+		} else {
+			var x0 = 0;
+		}
+		
+		var mMax = Math.max(Math.abs(Mx(x0)), Math.abs(Mx(xF1)), Math.abs(Mx(xF2)), Math.abs(Mx(xM1-eps)), Math.abs(Mx(xM1+eps)), Math.abs(Mx(xM2-eps)), Math.abs(Mx(xM2+eps)), Math.abs(MS));
+		// console.log(mMax);
+		var BMDFunction = function(x) {return 1/mMax*1.5*(Mx(L/12*(x+6)))-3.5;};
+
+		var BMD = board2.create('functiongraph',[BMDFunction , -6,6], {strokeWidth:3, highlight: false} );
+		
+		// axes
+		var m = dcmls(mMax);
+
+		var xaxism = board.create('segment', [[-6,-3.5],[6.2,-3.5]], {fixed: true, highlight: false, strokeWidth:2, strokeColor: 'black' , withLabel:true, name: 'x(m)', 
+			label: {visible: true, autoPosition: false, position: 'bot', offset:[290,0], labelColor:'black', fontSize:15}, lastArrow:{type:1, size:4}});
+		
+		var xtksm= board2.create('ticks', [xaxism, [ 3, 6, 9, 12]], { highlight: false, strokeWidth: 2, strokeColor: 'black', majorHeight: 7, 
+			drawLabels: true, labels:[(L/4).toFixed(2),(L/2).toFixed(2),(L*3/4).toFixed(2),L.toFixed(2)], 
+			drawZero: false, drawLabels:true, 	minorTicks:0, majorTicks:0, label: {highlight: false, fontSize: 14, cssStyle:'font-weight:bold',
+			offset: [-10, -20]}});
+		
+		var maxis= board.create('segment', [[-6,-5.3],[-6,-1.7]], {fixed: true, highlight: false, strokeWidth:2, strokeColor: 'black' , withLabel:true, name: 'M(kN.m)', 
+			label: {visible: true, autoPosition: false, position: 'bot', offset:[-15,95], labelColor:'black', fontSize:20}, lastArrow:{type:1, size:4}});
+		
+		var mtks= board2.create('ticks', [maxis, [0.3,1.05,1.8,2.55,3.3]], { highlight: false, strokeWidth: 2, strokeColor: 'black', majorHeight: 5, drawLabels: true, 
+			labels:[(-1*mMax).toFixed(m), (-1/2*mMax).toFixed(m), 0, (1/2*mMax).toFixed(m), mMax.toFixed(m)],  drawZero: false, drawLabels:true, 
+			minorTicks:0, majorTicks:0, label: {fontSize: 15, offset: [-40, 0], cssStyle:'font-weight:bold'}});
+		
+		var hGridsM = [];
+		for (i=0; i<5; i++){
+				hGridsM[i] = board.create('segment', [[-6,-5+i*0.75],[6.2,-5+i*0.75]], {fixed: true, highlight: false, strokeWidth:1, strokeColor: '#ff9f9f', layer:0});
+		}
+		
+		board2.unsuspendUpdate();
+		
+		drawings.push([SFD, xaxis, xtks, vaxis, vtks, BMD, xaxism, xtksm, maxis, mtks, hGridsV, hGridsM]);
+	}
+	
+	
+</script>
+
+
