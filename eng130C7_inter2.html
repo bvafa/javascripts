@@ -60,11 +60,11 @@
 	
 	
 	// input
-	// types of beam 2 types, with two simple supports, cantiliver 
+	// types of beam 2 types, with two simple supports, Cantilever 
 	var inst1 = board.create('text',['-6.5',7.5,"1) Select the beam type"], {highlight:false, fontSize: 20, cssStyle: 'font-style: regular'});
 	
 	var inst1Checkbox1 = board.create('checkbox', ['-1.5',7.5, 'Simply supported'], {checked:true, highlight:false, fontSize: 17});
-	var inst1Checkbox2 = board.create('checkbox', ['2.5',7.5, 'Cantiliver (fixed)'], {checked: false, highlight:false, fontSize: 17});
+	var inst1Checkbox2 = board.create('checkbox', ['2.5',7.5, 'Cantilever (fixed)'], {checked: false, highlight:false, fontSize: 17});
 	
 	
 	JXG.addEvent(inst1Checkbox1.rendNodeCheckbox, 'change', function() {
