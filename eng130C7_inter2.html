@@ -52,17 +52,16 @@
 	var L = 5;
 	var ssb = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_sb.jpg', [-6.0,-2.5], [12,0.5]], {fixed: true, visible: true, highlight:false});
 	var ssbs1 = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_sb_s1.jpg', [-6.4,-3.29], [0.9,0.8]], {fixed: true, visible: true, highlight:false});
-	// ssbs1_slider is for the right-hand support; the name should be changed to ssb2_slider later 
-  var ssbs1_slider = board.create('slider', [[12/5-6, '-2.8'], ['6.0', '-2.8'], [L/5, L, L]], {snapWidth: 0.25, withLabel: false});
-	var ssbs2 = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_sb_s2.jpg', [function (){return ssbs1_slider.Value()/L*12 - 0.45 - 6;},'-3.29'], [0.9,0.8]], {fixed: true, visible: true, highlight:false});
-	var ssbsText = board.create('text',[function (){return ssbs1_slider.Value()/L*12 - 0.45 - 6;},'-3.5',function(){return 'x=' + ssbs1_slider.Value();}], {highlight:false, fontSize: 15, cssStyle: 'font-style: regular'});
+	var ssbs2_slider = board.create('slider', [[12/5-6, '-2.8'], ['6.0', '-2.8'], [L/5, L, L]], {snapWidth: 0.25, withLabel: false});
+	var ssbs2 = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_sb_s2.jpg', [function (){return ssbs2_slider.Value()/L*12 - 0.45 - 6;},'-3.29'], [0.9,0.8]], {fixed: true, visible: true, highlight:false});
+	var ssbsText = board.create('text',[function (){return ssbs2_slider.Value()/L*12 - 0.45 - 6;},'-3.5',function(){return 'x=' + ssbs2_slider.Value().toFixed(1);}], {highlight:false, fontSize: 15, cssStyle: 'font-style: regular'});
 	var cb = board.create('image', ['https://engcourses-uofa.ca/wp-content/uploads/eng130C7_inter2_cb.jpg', [-6.3,-2.85], [12.3,1.2]], {fixed: true, visible: false, highlight:false});
 
 	
 	
 	// input
 	// types of beam 2 types, with two simple supports, cantiliver 
-	var inst1 = board.create('text',['-6.5',7.5,"1) Select type of beam"], {highlight:false, fontSize: 20, cssStyle: 'font-style: regular'});
+	var inst1 = board.create('text',['-6.5',7.5,"1) Select the beam type"], {highlight:false, fontSize: 20, cssStyle: 'font-style: regular'});
 	
 	var inst1Checkbox1 = board.create('checkbox', ['-1.5',7.5, 'Simply supported'], {checked:true, highlight:false, fontSize: 17});
 	var inst1Checkbox2 = board.create('checkbox', ['2.5',7.5, 'Cantiliver (fixed)'], {checked: false, highlight:false, fontSize: 17});
@@ -74,8 +73,8 @@
 			ssb.setAttribute({visible : true});
 			ssbs1.setAttribute({visible : true});
 			ssbs2.setAttribute({visible : true});
-			ssbs1_slider = board.create('slider', [[12/5-6, '-2.8'], ['6.0', '-2.8'], [L/5, L, L]], {snapWidth: 0.25, withLabel: false});
-			ssbsText = board.create('text',[function (){return ssbs1_slider.Value()/L*12 - 0.45 - 6;},'-3.5',function(){return 'x=' + ssbs1_slider.Value();}], {highlight:false, fontSize: 15, cssStyle: 'font-style: regular'});
+			ssbs2_slider = board.create('slider', [[12/5-6, '-2.8'], ['6.0', '-2.8'], [L/5, L, L]], {snapWidth: 0.1, withLabel: false});
+			ssbsText = board.create('text',[function (){return ssbs2_slider.Value()/L*12 - 0.45 - 6;},'-3.5',function(){return 'x=' + ssbs2_slider.Value();}], {highlight:false, fontSize: 15, cssStyle: 'font-style: regular'});
 			cb.setAttribute({visible : false});
 
 			
@@ -85,7 +84,7 @@
 			ssb.setAttribute({visible : false});
 			ssbs1.setAttribute({visible : false});
 			ssbs2.setAttribute({visible : false});
-			ssbs1_slider.remove();
+			ssbs2_slider.remove();
 			ssbsText.remove();
 			cb.setAttribute({visible : true});
 
@@ -100,7 +99,7 @@
 			ssb.setAttribute({visible : false});
 			ssbs1.setAttribute({visible : false});
 			ssbs2.setAttribute({visible : false});
-			ssbs1_slider .remove();
+			ssbs2_slider .remove();
 			ssbsText.remove();
 			cb.setAttribute({visible : true});
 
@@ -111,19 +110,19 @@
 			ssb.setAttribute({visible : true});
 			ssbs1.setAttribute({visible : true});
 			ssbs2.setAttribute({visible : true});
-			ssbs1_slider = board.create('slider', [[12/5-6, '-2.8'], ['6.0', '-2.8'], [L/5, L, L]], {snapWidth: 0.25, withLabel: false});
-			ssbsText = board.create('text',[function (){return ssbs1_slider.Value()/L*12 - 0.45 - 6;},'-3.5',function(){return 'x=' + ssbs1_slider.Value();}], {highlight:false, fontSize: 15, cssStyle: 'font-style: regular'});
+			ssbs2_slider = board.create('slider', [[12/5-6, '-2.8'], ['6.0', '-2.8'], [L/5, L, L]], {snapWidth: 0.1, withLabel: false});
+			ssbsText = board.create('text',[function (){return ssbs2_slider.Value()/L*12 - 0.45 - 6;},'-3.5',function(){return 'x=' + ssbs2_slider.Value();}], {highlight:false, fontSize: 15, cssStyle: 'font-style: regular'});
 			cb.setAttribute({visible : false});
-
+	
 			// inputG_SS('FS');
 		}
 	}, inst1Checkbox2);
 	
 	
 	
-	var inst2 = board.create('text',['-6.5',6.7,"2) Input the beam length (m)"], {highlight:false, fontSize: 20, cssStyle: 'font-style: regular'});
+	var inst2 = board.create('text',['-6.5',6.7,"2) Input the beam's length (m)"], {highlight:false, fontSize: 20, cssStyle: 'font-style: regular'});
 	var beamLInput = board.create('input', ['-0.5',6.7, '5', 'L=  '],{cssStyle: 'width: 30px; font-style: italic', fontSize:15});
-	var text1 = board.create('text',['0.6',6.7,"(press enter) Note: minimum L = 1"], {highlight:false, fontSize: 14, cssStyle: 'font-weight: bold;'});
+	var text1 = board.create('text',['0.6',6.7,"(press enter) Note: minimum  1 &leq; <i>L</i> &leq; 10"], {highlight:false, fontSize: 14, cssStyle: 'font-weight: bold;'});
 
 
 	
@@ -133,24 +132,28 @@
 	
 	JXG.addEvent(beamLInput.rendNodeInput, 'change', function() {
 		L = parseFloat(Math.abs(beamLInput.Value()));
-		if (L < 1) L=1.0;
+		if (L < 1 || L>10) {
+			L=1.0;
+			beamLInput._value = L;
+			beamLInput.rendNodeInput.value = L;
+		}
 		pLoad1Slider.setMax(L);
 		pLoad2Slider.setMax(L);
-		pLoad1Slider.visProp.snapwidth=L/20;
-		pLoad2Slider.visProp.snapwidth=L/20;
+		pLoad1Slider.visProp.snapwidth=0.1;
+		pLoad2Slider.visProp.snapwidth=0.1;
 				
 		mLoad1Slider.setMax(L);
 		mLoad2Slider.setMax(L);
-		mLoad1Slider.visProp.snapwidth=L/20;
-		mLoad2Slider.visProp.snapwidth=L/20;
+		mLoad1Slider.visProp.snapwidth=0.1;
+		mLoad2Slider.visProp.snapwidth=0.1;
 		
-		ssbs1_slider.setMax(L);
-		ssbs1_slider.setMin(L/5);
-		ssbs1_slider.setValue(L);
-		ssbs1_slider.visProp.snapwidth=L/20;
+		ssbs2_slider.setMax(L);
+		ssbs2_slider.setMin(L/5);
+		ssbs2_slider.setValue(L);
+		ssbs2_slider.visProp.snapwidth=0.1;
 		
-		dInputBoxUpdate();
 		aInputBoxUpdate();
+		
 		
 		
 		}, beamLInput);
@@ -160,7 +163,7 @@
 	var pLoad1Checkbox = board.create('checkbox', ['-5.2',5.4, 'Point load (kN)'], {checked:true, fontSize: 15});
 	var pLoad1Input = board.create('input', ['-2.5',5.4, '5', 'F1=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
 	var pLoad1UpCheckbox = board.create('checkbox', ['-1.2',5.4, 'Up'], {checked:false, fontSize: 15});
-	var pLoad1Slider = board.create('slider', [['0.0', '5.4'], ['5.0', '5.4'], [0, 0, L]], {name: 'x', label:{fontSize: 15}, snapWidth: 0.25, withLabel: true,  withTicks: true, ticks:{defaultDistance: 1.0, equidistant: true, insertTicks: false, drawZero: true, drawLabels: false, majorHeight: 15, minorTicks: 0}});
+	var pLoad1Slider = board.create('slider', [['0.0', '5.4'], ['5.0', '5.4'], [0, 0, L]], {name: 'x', label:{fontSize: 15}, snapWidth: 0.1, withLabel: true,  withTicks: true, ticks:{defaultDistance: 1.0, equidistant: true, insertTicks: false, drawZero: true, drawLabels: false, majorHeight: 15, minorTicks: 0}});
 	function pLoad1(dy,board) {
 		var L1P1 = board.create('point', [function(){return xS(pLoad1Slider.Value())-6;},function(){if (pLoad1UpCheckbox.Value()) {return -2+dy;} else {return 0+dy;}}],{visible:false});
 		var L1P2 = board.create('point', [function(){return xS(pLoad1Slider.Value())-6;},function(){if (pLoad1UpCheckbox.Value()) {return 0+dy;} else {return -2+dy;}}],{visible:false});
@@ -174,7 +177,7 @@
 	var pLoad2Checkbox = board.create('checkbox', ['-5.2',4.7, 'Point load (kN)'], {checked: false, fontSize: 15});
 	var pLoad2Input = board.create('input', ['-2.5',4.7, '0', 'F2=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
 	var pLoad2UpCheckbox = board.create('checkbox', ['-1.2',4.7, 'Up'], {checked:false, fontSize: 15});
-	var pLoad2Slider = board.create('slider', [['0.0', '4.7'], ['5.0', '4.7'], [0, 0, L]], {name: 'x', label:{fontSize: 15}, snapWidth: 0.25, withLabel: true,  withTicks: true, ticks:{defaultDistance: 1.0, equidistant: true, insertTicks: false, drawZero: true, drawLabels: false, majorHeight: 15, minorTicks: 0}});
+	var pLoad2Slider = board.create('slider', [['0.0', '4.7'], ['5.0', '4.7'], [0, 0, L]], {name: 'x', label:{fontSize: 15}, snapWidth: 0.1, withLabel: true,  withTicks: true, ticks:{defaultDistance: 1.0, equidistant: true, insertTicks: false, drawZero: true, drawLabels: false, majorHeight: 15, minorTicks: 0}});
 	function pLoad2(dy, board) {
 		var L2P1 = board.create('point', [function(){return xS(pLoad2Slider.Value())-6;},function(){if (pLoad2UpCheckbox.Value()) {return -2+dy;} else {return 0+dy;}}],{visible:false});
 		var L2P2 = board.create('point', [function(){return xS(pLoad2Slider.Value())-6;},function(){if (pLoad2UpCheckbox.Value()) {return 0+dy;} else {return -2+dy;}}],{visible:false});
@@ -211,7 +214,7 @@
 	var mLoad2Checkbox = board.create('checkbox', ['-6.3',3.3, 'Couple moment (kN.m)'], {checked: false, fontSize: 15});
 	var mLoad2Input = board.create('input', ['-2.6',3.3, '0', 'M2=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
 	var mLoad2UpCheckbox = board.create('checkbox', ['-1.2',3.3, 'CW'], {checked:false, fontSize: 15});
-	var mLoad2Slider = board.create('slider', [['0.0', '3.3'], ['5.0', '3.3'], [0, 0, L]], {name: 'x', label:{fontSize: 15},snapWidth: 0.25, withLabel: true,  withTicks: true, ticks:{defaultDistance: 1.0, equidistant: true, insertTicks: false, drawZero: true, drawLabels: false, majorHeight: 15, minorTicks: 0}});
+	var mLoad2Slider = board.create('slider', [['0.0', '3.3'], ['5.0', '3.3'], [0, 0, L]], {name: 'x', label:{fontSize: 15},snapWidth: 0.1, withLabel: true,  withTicks: true, ticks:{defaultDistance: 1.0, equidistant: true, insertTicks: false, drawZero: true, drawLabels: false, majorHeight: 15, minorTicks: 0}});
 	function mLoad2(dy, board) {
 		var M2P1 = board.create('point', [function(){return xS(mLoad2Slider.Value())-6;}, -2.3+dy] , {visible: function(){return (mLoad2Input.Value() != 0 && mLoad2Checkbox.Value());}, size:2, withLabel:false, color: 'tomato'});
 		var M2P2 = board.create('point', [function(){return xS(mLoad2Slider.Value())-6;}, -2.7+dy], {visible:false, fixed:true});
@@ -236,13 +239,17 @@
 	var dL1Input = board.create('input', ['-2.7',1.3, '2', 'd=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
 	var aL1Input = board.create('input', ['-1.2',1.3, '1', 'a=  '],{cssStyle: 'width: 35px; font-style: italic', fontSize:15});
 	
-	var text2 = board.create('text',['-4.8',0.6,"(press enter) Note: a + d < L"], {highlight:false, fontSize: 14, cssStyle: 'font-weight: bold;'});
+	var text2 = board.create('text',['-4.8',0.6,"(press enter) Note: <i>a + d < L</i>"], {highlight:false, fontSize: 14, cssStyle: 'font-weight: bold;'});
 	
 	var out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), parseFloat(w1L1Input.Value()),parseFloat(w2L1Input.Value()), board);
 	
 	// function for updating the input boxes of the distributed load
 	
 	var dInputBoxUpdate = function () {
+		if (parseFloat(dL1Input.Value())<0.05){
+			dL1Input._value = 0.05;
+			dL1Input.rendNodeInput.value= 0.05;
+		}
 		if (parseFloat(dL1Input.Value()) +  parseFloat(aL1Input.Value()) > L){
 			dL1Input._value = L - aL1Input.Value();
 			dL1Input.rendNodeInput.value = dL1Input.Value();
@@ -259,14 +266,26 @@
 	}
 	
 	var aInputBoxUpdate = function() {
+		
+		if (parseFloat(aL1Input.Value())<0){
+			aL1Input._value = 0;
+			aL1Input.rendNodeInput.value= 0;
+		}
 		if (parseFloat(aL1Input.Value()) + parseFloat(dL1Input.Value()) < L){
 			if (linLoad1Checkbox.Value()){
 				remv(out1);
 				out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), parseFloat(w1L1Input.Value()),parseFloat(w2L1Input.Value()), board);
 			}
 		} else {
-			aL1Input._value = L - dL1Input.Value();
-			aL1Input.rendNodeInput.value= L - dL1Input.Value();
+			if (L - parseFloat(dL1Input.Value())>0){
+				aL1Input._value = L - dL1Input.Value();
+				aL1Input.rendNodeInput.value= L - dL1Input.Value();
+			} else {
+				aL1Input._value = 0;
+				aL1Input.rendNodeInput.value= 0;
+				dInputBoxUpdate();
+			}
+				
 			if (linLoad1Checkbox.Value()){
 				remv(out1);
 				out1 = distLoad(xS(parseFloat(aL1Input.Value()))-6, xS(parseFloat(dL1Input.Value())), parseFloat(w1L1Input.Value()),parseFloat(w2L1Input.Value()), board);
@@ -365,7 +384,7 @@
 		var segmentV2 =  board.create('segment', [[x2,y-0.2], [x2,y+0.2]], {fixed: true, highlight: false, strokeWidth:1.5, strokeColor: 'black'});
 	}
 	
-	dimension(-6,6,-3.8, function(){return 'L='+L});
+	dimension(-6,6,-3.8, function(){return '<i>L</i>='+L});
 	
 	
 	var button1 = board.create('button', [-1.9, -4.8, 'SOLVE',solve], {fontsize:20});
@@ -380,7 +399,7 @@
 		
 		// variables
 		var F1=0; var F2=0; var xF1=0; var xF2=0; var M1=0; var xM1=0; var M2=0; var xM2=0; var w1=1; var w2=0; var d=0; var a=0; // w1 is set to 1 to avoid dividing by zero when calculating support reactions
-		var xS2 = ssbs1_slider.Value();
+		var xS2 = ssbs2_slider.Value();
 		
 		var board =  board2;
 		board.suspendUpdate();
@@ -456,8 +475,8 @@
 			drawings.push(S1P1, S1P2, S1yArrw);
 		}		
 		if (S2y!=null && Math.abs(S2y)>0.01){
-			var S2P1 = board.create('point', [xS(ssbs1_slider.Value())-6,function(){if (S2y>0) {return 4;} else {return 5;}}],{visible:false});
-			var S2P2 = board.create('point', [xS(ssbs1_slider.Value())-6, function(){if (S2y>0) {return 5;} else {return 4;}}],{visible:false});
+			var S2P1 = board.create('point', [xS(ssbs2_slider.Value())-6,function(){if (S2y>0) {return 4;} else {return 5;}}],{visible:false});
+			var S2P2 = board.create('point', [xS(ssbs2_slider.Value())-6, function(){if (S2y>0) {return 5;} else {return 4;}}],{visible:false});
 			var S2yArrw = board.create('arrow', [S2P1, S2P2],{visible: true, 
 				strokeWidth:4, strokeColor:'blue', fixed: true, highlight: false, lastArrow:{type:2, size: 4}, withLabel: true, name: Math.abs(S2y).toFixed(2),
 				label: {visible: true, autoPosition: false, position: 'top', offset:[-20,-35], labelColor:'black', fontSize:17, cssStyle:'font-weight:bold'}});
@@ -485,7 +504,7 @@
 		
 		//
 		function VS1(x) {
-			if (x<=0){
+			if (x<0){
 				return 0;
 			} else {
 				return S1y;
@@ -494,7 +513,7 @@
 		
 		if (inst1Checkbox1){
 			function VS2(x) {
-				if (x <= xS2){
+				if (x < xS2){
 					return 0;
 				} else{
 					return S2y;
@@ -515,8 +534,19 @@
 					return -1*((w2-w1)/(2*d)*Math.pow(d,2)+w1*(a+d)) +w1*a;
 				}
 			}
+			
+			function distLoadIntV(x) {
+				if (x<a) {
+					return 0;
+				} else {
+					return (Math.sign((a+d)-x)+1)/2*(-1*((w2-w1)/(6*d)*Math.pow((x-a),3)+w1*x*x/2) + w1*a*x -w1*a*a/2) + (Math.sign(x-(a+d))+1)/2*(
+							-1*((w2-w1)/(6*d)*Math.pow((d),3)+w1*(d+a)*(d+a)/2) + w1*a*(d+a) -w1*a*a/2 + 
+							(x-(a+d))*(-1*((w2-w1)/(2*d)*Math.pow(d,2)+w1*(a+d)) + w1*a));
+				}	
+			}
 		} else {
 			function distLoadV(x){return 0;}
+			function distLoadIntV(x) {return 0;}
 		}
 
 		
@@ -536,7 +566,8 @@
 		
 		var Vx = function(x) {return VS1(x) + distLoadV(x) + pLoad1V(x) + pLoad2V(x) + VS2(x);}; 
 		
-		var eps = 0.01;
+		
+		var eps = 0.002;
 		var vMax = Math.max(Math.abs(Vx(0+eps)), Math.abs(Vx(a+d)), Math.abs(Vx(xF1-eps)),Math.abs(Vx(xF1+eps)), Math.abs(Vx(xF2-eps)), 
 			Math.abs(Vx(xF2+eps)), Math.abs(Vx(xS2-eps)), Math.abs(Vx(xS2+eps)), Math.abs(Vx(L-eps)));
 		var sfShear =  1/vMax;
@@ -589,29 +620,43 @@
 				return -1*M2;
 		}};
 		
-		var Mx =  function(x) {return Math.round(1000*(JXG.Math.Numerics.I([0,x], Vx) + (-1*MS) + mLoad1M(x) + mLoad2M(x)))/1000;}; // -1 for complying with internal force signs
+		if (MS==null) MS=0; 
+		//var Mx =  function(x) {return (JXG.Math.Numerics.I([0,x], Vx) + (-1*MS) + mLoad1M(x) + mLoad2M(x));}; // -1 for complying with internal force signs
+		var Mx =  function(x) { return -1*MS + VS1(x)*x + pLoad1V(x)*(x-xF1) + pLoad2V(x)*(x-xF2) + VS2(x)*(x-xS2) + mLoad1M(x) + mLoad2M(x) + distLoadIntV(x);}; // +
+		var x0 = 0;
+		if (linLoad1Checkbox.Value()){
+			 var x2 = [];
+			 x2.push(a+d);
+			 if (xF1>a && xF1<a+d) x2.push(xF1);
+			 if (xF2>a && xF2<a+d) x2.push(xF2);
+			 if (xS2>a && xS2<a+d) x2.push(xS2);
+			 var b = Math.min(...x2);
+			
+			if (Vx(a)*Vx(b-0.001)<0){
 		
-		if (linLoad1Checkbox.Value() && Vx(a)*Vx(a+d)<0){
-			if (w1 == w2){
-				var x0=(w1*a+Vx(a))/w1;
-			} else {
-				var c1 = -1*(w2-w1)/(2*d);
-				var c2 = w1*a+Vx(a);
-				var c3 = c1*a*a + c2;
-				var x01 = (2*a*c1+w1+ Math.sqrt(Math.pow(2*a*c1+w1,2)-4*c1*c3))/(2*c1);
-				var x02 = (2*a*c1+w1- Math.sqrt(Math.pow(2*a*c1+w1,2)-4*c1*c3))/(2*c1);
-				if (a<=x01 && x01<=a+d){
-					var x0 =x01;
+				if (w1L1Input.Value() == w2L1Input.Value()){  // comparing the strings
+					var x0=(w1*a+Vx(a))/w1;
+				
 				} else {
-					var x0 = x02;
+					var c1 = -1*(w2-w1)/(2*d);
+					var c2 = w1*a+Vx(a);
+					var c3 = c1*a*a + c2;
+					var x01 = (2*a*c1+w1+ Math.sqrt(Math.pow(2*a*c1+w1,2)-4*c1*c3))/(2*c1);
+					var x02 = (2*a*c1+w1- Math.sqrt(Math.pow(2*a*c1+w1,2)-4*c1*c3))/(2*c1);
+					if (a<=x01 && x01<=b){
+						x0 =x01;
+					} else {
+						x0 = x02;
+					}
 				}
+			} else {
+				x0 = 0;
 			}
-		} else {
-			var x0 = 0;
 		}
 		
-		var mMax = Math.max(Math.abs(Mx(x0)), Math.abs(Mx(xF1)), Math.abs(Mx(xF2)), Math.abs(Mx(xM1-eps)), Math.abs(Mx(xM1+eps)), Math.abs(Mx(xM2-eps)), Math.abs(Mx(xM2+eps)), Math.abs(MS));
-		// console.log(mMax);
+		var mMax = Math.max(Math.abs(Mx(x0)), Math.abs(Mx(xF1)), Math.abs(Mx(xF2)), Math.abs(Mx(xM1-eps)), Math.abs(Mx(xM1+eps)), 
+			Math.abs(Mx(xM2-eps)), Math.abs(Mx(xM2+eps)), Math.abs(MS), Math.abs(Mx(xS2-eps)));
+					
 		var BMDFunction = function(x) {return 1/mMax*1.5*(Mx(L/12*(x+6)))-3.5;};
 
 		var BMD = board2.create('functiongraph',[BMDFunction , -6,6], {strokeWidth:3, highlight: false} );
